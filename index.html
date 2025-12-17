@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Revival - Snake Game with Kiro AI</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        #gameContainer {
+            background: #1a1a2e;
+            border: 4px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0, 255, 136, 0.3);
+        }
+        h1 {
+            color: #00ff88;
+            text-align: center;
+            margin-top: 0;
+            font-size: 28px;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        #gameBoard {
+            background: #0f0f1e;
+            border: 2px solid #00ff88;
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
+            position: relative;
+        }
+        .snake {
+            background: #00ff88;
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 2px;
+            box-shadow: 0 0 5px #00ff88;
+        }
+        .food {
+            background: #ff6b6b;
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #ff6b6b;
+        }
+        #score {
+            color: #00ff88;
+            text-align: center;
+            font-size: 20px;
+            margin-top: 15px;
+        }
+        #controls {
+            text-align: center;
+            margin-top: 20px;
+            color: #00ff88;
+        }
+        button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <h1>🐍 Retro Revival: Snake Game with Kiro AI</h1>
+        <p style="color: #00ff88; text-align: center;">Classic Snake Game Powered by Kiro - Complex Logic Made Simple</p>
+        <div id="gameBoard"></div>
+        <div id="score">Score: 0</div>
+        <div id="controls">
+            <button onclick="startGame()">Start Game</button>
+            <button onclick="resetGame()">Reset</button>
+            <p>Use Arrow Keys to Move the Snake</p>
+        </div>
+    </div>
+
+    <script>
+        // Retro Revival - Snake Game with Kiro AI Acceleration
+        // This project demonstrates how Kiro simplifies complex game logic
+        
+        const gameBoard = document.getElementById('gameBoard');
+        const scoreDisplay = document.getElementById('score');
+        const boardSize = 400;
+        const gridSize = 20;
+        
+        let snake = [{x: 100, y: 100}];
+        let food = {x: 200, y: 200};
+        let direction = {x: gridSize, y: 0};
+        let nextDirection = {x: gridSize, y: 0};
+        let score = 0;
+        let gameRunning = false;
+        let gameSpeed = 100;
+        
+        function startGame() {
+            if (!gameRunning) {
+                gameRunning = true;
+                gameLoop();
+            }
+        }
+        
+        function resetGame() {
+            snake = [{x: 100, y: 100}];
+            direction = {x: gridSize, y: 0};
+            nextDirection = {x: gridSize, y: 0};
+            score = 0;
+            scoreDisplay.textContent = 'Score: ' + score;
+            gameRunning = false;
+            gameBoard.innerHTML = '';
+        }
+        
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            direction = nextDirection;
+            const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
+            
+            // Kiro AI assists with boundary logic
+            if (head.x < 0 || head.x >= boardSize || head.y < 0 || head.y >= boardSize) {
+                gameRunning = false;
+                alert('Game Over! Final Score: ' + score);
+                resetGame();
+                return;
+            }
+            
+            snake.unshift(head);
+            
+            // Check collision with food
+            if (head.x === food.x && head.y === food.y) {
+                score += 10;
+                scoreDisplay.textContent = 'Score: ' + score;
+                food = generateFood();
+            } else {
+                snake.pop();
+            }
+            
+            // Check collision with self
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    gameRunning = false;
+                    alert('Game Over! Final Score: ' + score);
+                    resetGame();
+                    return;
+                }
+            }
+            
+            render();
+            setTimeout(gameLoop, gameSpeed);
+        }
+        
+        function generateFood() {
+            return {
+                x: Math.floor(Math.random() * (boardSize / gridSize)) * gridSize,
+                y: Math.floor(Math.random() * (boardSize / gridSize)) * gridSize
+            };
+        }
+        
+        function render() {
+            gameBoard.innerHTML = '';
+            
+            // Render snake
+            snake.forEach(segment => {
+                const snakeEl = document.createElement('div');
+                snakeEl.className = 'snake';
+                snakeEl.style.left = segment.x + 'px';
+                snakeEl.style.top = segment.y + 'px';
+                gameBoard.appendChild(snakeEl);
+            });
+            
+            // Render food
+            const foodEl = document.createElement('div');
+            foodEl.className = 'food';
+            foodEl.style.left = food.x + 'px';
+            foodEl.style.top = food.y + 'px';
+            gameBoard.appendChild(foodEl);
+        }
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowUp':
+                    if (direction.y === 0) nextDirection = {x: 0, y: -gridSize};
+                    break;
+                case 'ArrowDown':
+                    if (direction.y === 0) nextDirection = {x: 0, y: gridSize};
+                    break;
+                case 'ArrowLeft':
+                    if (direction.x === 0) nextDirection = {x: -gridSize, y: 0};
+                    break;
+                case 'ArrowRight':
+                    if (direction.x === 0) nextDirection = {x: gridSize, y: 0};
+                    break;
+            }
+        });
+        
+        // Initial render
+        render();
+    </script>
+</body>
+</html>
